@@ -1,4 +1,6 @@
-# flightaware-go
-Quick conversion of a barebone Flightaware client from Ruby to Go.
+# fa-tail
 
-Requires a config.toml configuration file in $HOME/.flightaware/.
+Small Go utility to scan & parse the various Flightaware feeds to give
+information about the last record during recording or replaying.
+
+
