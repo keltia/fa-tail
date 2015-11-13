@@ -9,12 +9,12 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
 	"strconv"
 	"time"
+	"github.com/keltia/flightaware-go/flightaware"
 )
 
 const (
@@ -37,32 +37,6 @@ type FArecord struct {
 	Reg        string
 	Squawk     string
 	UpdateType string
-}
-
-type FApoint struct {
-	Lat float32
-	Lon float32
-}
-
-type FAflightplan struct {
-	Type       string
-	Ident      string
-	AircraftType string
-	Alt          string
-	Atcident     string
-	Dest         string
-	Edt          string
-	Eta          string
-	FacilityHash string
-	FacilityName string
-	Id           string
-	Orig         string
-	Reg          string
-	Route        string
-	Speed        string
-	Status       string
-	Waypoints    []FApoint
-	Ete          string
 }
 
 var (
@@ -137,14 +111,9 @@ func main() {
 
 	var (
 		lastFA FArecord
-		lastFP FAflightplan
 	)
 
-	// Check input record
-	if err := json.Unmarshal([]byte(lastRecord), &lastFA); err != nil {
-		fmt.Printf("Unable to decode %v: %v\n", lastRecord, err)
-		os.Exit(1)
-	}
+	recType, _ := flightaware.GetType([]byte(lastRecord))
 
 	if fCount {
 		fmt.Printf("%s: records %d size %d bytes\n", fn, nbRecords, fileStat.Size())
@@ -152,27 +121,30 @@ func main() {
 		fmt.Printf("%s: size %d bytes\n", fn, fileStat.Size())
 	}
 
-	if lastFA.Type != "position" {
-		// Try a flightplan
-		if err := json.Unmarshal([]byte(lastRecord), &lastFP); err != nil {
-			fmt.Printf("Unable to decode %v: %v\n", lastRecord, err)
-			os.Exit(1)
-		}
+	lastOne, err := flightaware.DecodeRecord([]byte(lastRecord))
+	switch recType {
+	case "flightplan":
+		lastPS := lastOne.(flightaware.FAflightplan)
 		fmt.Printf("Last record is a flightplan for %s (%s):\n",
-			lastFP.Ident, lastFP.AircraftType)
+			lastPS.Ident, lastPS.AircraftType)
 
-		if lastFP.Status == "Z" {
-			running, _ := strconv.ParseInt(lastFP.Ete, 10, 64)
+		if lastPS.Status == "Z" {
+			running, _ := strconv.ParseInt(lastPS.Ete, 10, 64)
 			fmt.Printf("  At %s (completed, running time: %d s\n",
-			lastFP.Dest, running)
+				lastPS.Dest, running)
 		} else {
-			time_edt, _ := strconv.ParseInt(lastFP.Edt, 10, 64)
-			time_eta, _ := strconv.ParseInt(lastFP.Eta, 10, 64)
+			time_edt, _ := strconv.ParseInt(lastPS.Edt, 10, 64)
+			time_eta, _ := strconv.ParseInt(lastPS.Eta, 10, 64)
 			fmt.Printf("  From %s (%v) to %s (%v)\n",
-				lastFP.Orig, time.Unix(time_edt, 0),
-				lastFP.Dest, time.Unix(time_eta, 0))
+				lastPS.Orig, time.Unix(time_edt, 0),
+				lastPS.Dest, time.Unix(time_eta, 0))
 		}
-	} else {
+	case "position":
+		lastPS := lastOne.(flightaware.FAposition)
+		fmt.Printf("Last record is a position for %s heading %s at alt %s\n",
+			lastPS.Ident, lastPS.Heading, lastPS.Alt)
+
+	default:
 		iClock, _ := strconv.ParseInt(lastFA.Clock, 10, 64)
 		fmt.Printf("Last record: %v\n", time.Unix(iClock, 0))
 	}
