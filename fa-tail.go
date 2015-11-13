@@ -120,8 +120,8 @@ func main() {
 		}
 	case "position":
 		lastPS := lastOne.(flightaware.FAposition)
-		fmt.Printf("Last record is a position for %s heading %s at alt %s\n",
-			lastPS.Ident, lastPS.Heading, lastPS.Alt)
+		fmt.Printf("%v: Last record is a position for %s heading %s at alt %s\n",
+			lastPS.Clock, lastPS.Ident, lastPS.Heading, lastPS.Alt)
 
 	default:
 		fmt.Printf("Last record: %v\n", lastRecord)
