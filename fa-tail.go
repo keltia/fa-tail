@@ -113,7 +113,7 @@ func main() {
 		lastFA FArecord
 	)
 
-	recType := flightaware.GetType(lastRecord)
+	recType, _ := flightaware.GetType([]byte(lastRecord))
 
 	if fCount {
 		fmt.Printf("%s: records %d size %d bytes\n", fn, nbRecords, fileStat.Size())
@@ -121,10 +121,10 @@ func main() {
 		fmt.Printf("%s: size %d bytes\n", fn, fileStat.Size())
 	}
 
-	lastOne, err := flightaware.DecodeRecord(lastRecord)
+	lastOne, err := flightaware.DecodeRecord([]byte(lastRecord))
 	switch recType {
-	case "position":
-		lastPS := lastOne.(flightaware.FAposition)
+	case "flightplan":
+		lastPS := lastOne.(flightaware.FAflightplan)
 		fmt.Printf("Last record is a flightplan for %s (%s):\n",
 			lastPS.Ident, lastPS.AircraftType)
 
@@ -139,6 +139,11 @@ func main() {
 				lastPS.Orig, time.Unix(time_edt, 0),
 				lastPS.Dest, time.Unix(time_eta, 0))
 		}
+	case "position":
+		lastPS := lastOne.(flightaware.FAposition)
+		fmt.Printf("Last record is a position for %s heading %s at alt %s\n",
+			lastPS.Ident, lastPS.Heading, lastPS.Alt)
+
 	default:
 		iClock, _ := strconv.ParseInt(lastFA.Clock, 10, 64)
 		fmt.Printf("Last record: %v\n", time.Unix(iClock, 0))
