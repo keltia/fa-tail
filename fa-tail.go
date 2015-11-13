@@ -22,23 +22,6 @@ const (
 	VERSION = "1.0"
 )
 
-type FArecord struct {
-	Type       string
-	AirGround  string
-	AltChange  string
-	Clock      string
-	Gs         string
-	Heading    string
-	Hexid      string
-	Id         string
-	Ident      string
-	Lat        string
-	Lon        string
-	Reg        string
-	Squawk     string
-	UpdateType string
-}
-
 var (
 	fVerbose bool
 	fCount   bool
@@ -109,10 +92,6 @@ func main() {
 		}
 	}
 
-	var (
-		lastFA FArecord
-	)
-
 	recType, _ := flightaware.GetType([]byte(lastRecord))
 
 	if fCount {
@@ -141,11 +120,10 @@ func main() {
 		}
 	case "position":
 		lastPS := lastOne.(flightaware.FAposition)
-		fmt.Printf("Last record is a position for %s heading %s at alt %s\n",
-			lastPS.Ident, lastPS.Heading, lastPS.Alt)
+		fmt.Printf("%v: Last record is a position for %s heading %s at alt %s\n",
+			lastPS.Clock, lastPS.Ident, lastPS.Heading, lastPS.Alt)
 
 	default:
-		iClock, _ := strconv.ParseInt(lastFA.Clock, 10, 64)
-		fmt.Printf("Last record: %v\n", time.Unix(iClock, 0))
+		fmt.Printf("Last record: %v\n", lastRecord)
 	}
 }
