@@ -3,3 +3,12 @@ go:
 - 1.4
 - 1.5
 - tip
+branches:
+  only:
+  - develop
+  - master
+install:
+  - go get github.com/naoina/toml
+  - go get github.com/keltia/flightaware-go/config
+  - go get github.com/keltia/flightaware-go/flightaware
+
