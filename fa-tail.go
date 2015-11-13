@@ -120,8 +120,9 @@ func main() {
 		}
 	case "position":
 		lastPS := lastOne.(flightaware.FAposition)
+		time_clock, _ := strconv.ParseInt(lastPS.Clock, 10, 64)
 		fmt.Printf("%v: Last record is a position for %s heading %s at alt %s\n",
-			lastPS.Clock, lastPS.Ident, lastPS.Heading, lastPS.Alt)
+			time.Unix(time_clock, 0), lastPS.Ident, lastPS.Heading, lastPS.Alt)
 
 	default:
 		fmt.Printf("Last record: %v\n", lastRecord)
