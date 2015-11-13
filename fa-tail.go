@@ -9,14 +9,12 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
 	"strconv"
 	"time"
-	"flightaware-go/flightaware"
-	"tmp/flightaware-go/flightaware"
+	"github.com/keltia/flightaware-go/flightaware"
 )
 
 const (
