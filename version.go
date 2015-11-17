@@ -5,4 +5,4 @@
  */
 package main
 
-const FT_VERSION = "1.0.1"
+const FT_VERSION = "1.0.2"
