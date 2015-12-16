@@ -15,12 +15,25 @@ import (
 	"strconv"
 	"time"
 	"github.com/keltia/flightaware-go/flightaware"
+	"path/filepath"
 )
 
 const (
 	BSIZE = 8192
-	VERSION = "1.0"
+
+	// my usage string
+	cliUsage	= `%s version %s
+Usage: %s [-o FILE] [-i N(s|mn|h|d)] [-v] [-d dest] feed
+
+`
 )
+
+// Redefine Usage
+var Usage = func() {
+		myName := filepath.Base(os.Args[0])
+        fmt.Fprintf(os.Stderr, cliUsage, myName, FT_VERSION, myName)
+        flag.PrintDefaults()
+}
 
 var (
 	fVerbose bool
@@ -31,6 +44,7 @@ var (
 func main() {
 	flag.BoolVar(&fCount, "c", false, "Count records.")
 	flag.BoolVar(&fVerbose, "v", false, "Be verbose")
+	flag.Usage = Usage
 	flag.Parse()
 
 	if len(flag.Args()) == 0 {
