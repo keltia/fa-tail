@@ -13,7 +13,8 @@ clean:
 	go clean -v
 
 fa-tail: fa-tail.go
-	go build -v
+	echo "This is replaced by github.com/keltia/flightaware-go."
+	exit 1
 
 push:
 	git push --all
